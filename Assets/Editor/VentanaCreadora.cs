@@ -6,10 +6,12 @@ using UnityEditor;
 public class VentanaCreadora : EditorWindow
 {
     private bool ModoManual;
+    public GameObject Camara;
     public GameObject CurrentFloor;
     public GameObject _Piso;
     public GameObject _Pared;
     public GameObject _Puerta;
+    public List<string> ListaDeCercanos;
 
     private int _CantidadDePuertas = 1;    
 
@@ -25,8 +27,14 @@ public class VentanaCreadora : EditorWindow
     {
         CurrentFloor = Selection.activeGameObject;
 
+        #region Cargar Datos
+        Camara = GameObject.Find("Main Camera");
         maxSize = new Vector2(300,300);
         minSize = new Vector2(400, 600);
+        _Piso = GameObject.Find("Piso");
+        _Pared = GameObject.Find("Pared");
+        _Puerta = GameObject.Find("Puerta");
+        #endregion
 
         if (CurrentFloor)
         {
@@ -80,8 +88,6 @@ public class VentanaCreadora : EditorWindow
 
         #endregion
 
-
-
         #region Modo Manual
         GUILayout.BeginHorizontal();
         ModoManual = GUILayout.Toggle(ModoManual, "▼",GUILayout.Width(10));
@@ -96,9 +102,12 @@ public class VentanaCreadora : EditorWindow
             if (GUILayout.Button("↑", GUILayout.Width(100)))
             {
                 GameObject PisoCreado = Instantiate(CurrentFloor);
-                PisoCreado.transform.position = CurrentFloor.transform.position + new Vector3(CurrentFloor.transform.position.x + 10, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z);
-                Selection.activeGameObject = PisoCreado;
+                PisoCreado.transform.position = new Vector3(CurrentFloor.transform.position.x + 10, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z);
+                DatosGenerales.ContadorDeSalas++;
                 CurrentFloor = PisoCreado;
+                PisoCreado.name = "Sala ";
+                Selection.activeGameObject = PisoCreado;
+                Debug.Log("" + DatosGenerales.ContadorDeSalas);
             }
         GUILayout.EndHorizontal();
         EditorGUILayout.Space();
@@ -108,18 +117,22 @@ public class VentanaCreadora : EditorWindow
             if (GUILayout.Button("←", GUILayout.Width(100)))
             {
                 GameObject PisoCreado = Instantiate(CurrentFloor);
-                PisoCreado.transform.position = CurrentFloor.transform.position + new Vector3(CurrentFloor.transform.position.x, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z-10);
-                Selection.activeGameObject = PisoCreado;
                 CurrentFloor = PisoCreado;
+                PisoCreado.transform.position = new Vector3(CurrentFloor.transform.position.x, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z +10);
+                PisoCreado.name = "Sala " + PisoCreado.transform.position.x + PisoCreado.transform.position.z;
+                DatosGenerales.ContadorDeSalas++;
+                Selection.activeGameObject = PisoCreado;
             }
             
         GUILayout.Label("", GUILayout.Width(87));
             if (GUILayout.Button("→", GUILayout.Width(100)))
             {
                 GameObject PisoCreado = Instantiate(CurrentFloor);
-                PisoCreado.transform.position = CurrentFloor.transform.position + new Vector3(CurrentFloor.transform.position.x, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z+10);
-                Selection.activeGameObject = PisoCreado;
                 CurrentFloor = PisoCreado;
+                PisoCreado.transform.position = new Vector3(CurrentFloor.transform.position.x, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z -10);
+                PisoCreado.name = "Sala " + PisoCreado.transform.position.x + PisoCreado.transform.position.z;
+                DatosGenerales.ContadorDeSalas++;
+                Selection.activeGameObject = PisoCreado;
             }            
         GUILayout.EndHorizontal();
         EditorGUILayout.Space();
@@ -129,14 +142,20 @@ public class VentanaCreadora : EditorWindow
             if (GUILayout.Button("↓", GUILayout.Width(100)))
             {
                 GameObject PisoCreado = Instantiate(CurrentFloor);
-                PisoCreado.transform.position = CurrentFloor.transform.position + new Vector3(CurrentFloor.transform.position.x-10, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z);
-                Selection.activeGameObject = PisoCreado;
                 CurrentFloor = PisoCreado;
+                PisoCreado.transform.position = new Vector3(CurrentFloor.transform.position.x - 10, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z); ;
+                PisoCreado.name = "Sala " + PisoCreado.transform.position.x + PisoCreado.transform.position.z;
+                DatosGenerales.ContadorDeSalas++;
+                Selection.activeGameObject = PisoCreado;
             }            
         GUILayout.EndHorizontal();
         }
 
 
+        #endregion
+
+        #region Gizmos
+               
         #endregion
 
         fixedValues();
@@ -149,4 +168,14 @@ public class VentanaCreadora : EditorWindow
         _CantidadDePuertas = Mathf.Max(_CantidadDePuertas, 1);
         _CantidadDePuertas = Mathf.Min(_CantidadDePuertas, 4);
     }
+
+    void BuscarCeldasVecinas()
+    {
+        string LugarActual = CurrentFloor.name;
+        char Posx = LugarActual[LugarActual.Length];
+        char Posy = LugarActual[LugarActual.Length - 1];
+        Debug.Log("" + Posx + Posy);                        
+    }
+
+   
 }
