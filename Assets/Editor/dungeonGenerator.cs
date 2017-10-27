@@ -11,7 +11,7 @@ public class dungeonGenerator : EditorWindow {
     Vector2 offset = new Vector2();
     Rect rekt;
 
-    int linesEvery = 20;
+    int linesEvery = 40;
     int thiccLinesEvery = 5;
 
     [ExecuteInEditMode]
