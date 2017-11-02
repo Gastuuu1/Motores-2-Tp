@@ -10,6 +10,7 @@ public class dungeonGenerator : EditorWindow {
     public GameObject _door;
     Vector2 offset = new Vector2();
     Rect rekt;
+    List<Vector2> positions = new List<Vector2>();
 
     int linesEvery = 40;
     int thiccLinesEvery = 5;
@@ -43,8 +44,12 @@ public class dungeonGenerator : EditorWindow {
             EditorGUILayout.HelpBox ( "Seleccione una pared", MessageType.Warning );
         }
         EditorGUILayout.Space ();
+
+
         //Lineas 
         GUI.BeginGroup(rekt);
+
+            //Recalcular segun las alertas 
         if ( !_door && !_wall && !_floor ) {
             rekt = new Rect(20, 220, 400, 400);
             maxSize = new Vector2(440, 650);
@@ -64,12 +69,11 @@ public class dungeonGenerator : EditorWindow {
 
         } else {
         rekt = new Rect(20, 85, 400, 400);
-            maxSize = new Vector2(440, 510);
-            minSize = new Vector2(440, 510);
+            maxSize = new Vector2(440, 530);
+            minSize = new Vector2(440, 530);
             Repaint();
-        }
-
-
+        }        
+            //Lineas en sí
         Handles.BeginGUI();
         for ( int i = (int) (0 + offset.x); i < position.width + offset.x; i += linesEvery ) {
             Handles.DrawLine(new Vector3(i, 0, 0), new Vector3(i, position.height, 0));
@@ -89,8 +93,49 @@ public class dungeonGenerator : EditorWindow {
             }
             thickLines++;
         }
+            //Los puntitos rojos que proximamente van a ser cuadrados
+        if ( !Event.current.control && Event.current.button == 0 && Event.current.type == EventType.mouseDown ) {
+            positions.Add(Event.current.mousePosition - offset);
+            Repaint();
+        }
+        foreach ( var pos in positions ) {
+            Handles.color = Color.red;
+            Handles.DrawSolidDisc(pos + offset, Vector3.forward, 2);
+            var col = Color.red;
+            col.a = .1f;
+            Handles.color = col;
+            Handles.CubeHandleCap(0, pos + offset, Quaternion.identity, 200, EventType.ContextClick);  //keondaestojelpmi            
+        }
         Handles.EndGUI();
         GUI.EndGroup();
 
+            //Boton para limpiar los puntitos 
+        Rect rectAdd = EditorGUILayout.BeginHorizontal("Button");
+        if(GUI.Button(rectAdd, GUIContent.none) ) {
+            positions.Clear();
+            Repaint();
+        }
+        GUILayout.Label("Clean");
+        EditorGUILayout.EndHorizontal();
+
+            ////boton para generar cositas
+        Rect generateRekt = EditorGUILayout.BeginHorizontal("Button");
+        if ( GUI.Button(generateRekt, GUIContent.none) ) {
+            foreach ( var p in positions ) {
+                _floor.transform.position = ReajustVector2(p);
+                Instantiate(_floor);
+            }
+        }
+        GUILayout.Label("Generate");
+        EditorGUILayout.EndHorizontal();
+
+    }
+
+    Vector3 ReajustVector2(Vector2 _v2 ) { //Ajusta el vector2 a v3 y lo reduce
+        Vector3 _v3;
+        _v3.x = _v2.x / 6;
+        _v3.y = 0;
+        _v3.z = _v2.y / 6;
+        return _v3;
     }
 }
