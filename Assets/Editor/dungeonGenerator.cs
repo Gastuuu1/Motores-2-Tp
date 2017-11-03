@@ -11,7 +11,11 @@ public class dungeonGenerator : EditorWindow
     public GameObject _door;
     Vector2 offset = new Vector2();
     Rect rekt;
+
     List<Vector2> positions = new List<Vector2>();
+    List<Vector2> CircleHandless = new List<Vector2>();
+
+    public List<GameObject> FloorList = new List<GameObject>();
 
     int linesEvery = 40;
     int thiccLinesEvery = 5;
@@ -56,19 +60,19 @@ public class dungeonGenerator : EditorWindow
 
 
         //Lineas 
-        GUI.BeginGroup(rekt);
 
+        #region Cosa de los if
         //Recalcular segun las alertas 
         if (!_door && !_wall && !_floor)
         {
-            rekt = new Rect(20, 220, 400, 400);
+            rekt = new Rect(20, 220, 400, 500);
             maxSize = new Vector2(440, 650);
             minSize = new Vector2(440, 650);
             Repaint();
         }
         else if ((!_door && !_wall) || (!_floor && !_wall) || (!_floor && !_door))
         {
-            rekt = new Rect(20, 170, 400, 400);
+            rekt = new Rect(20, 170, 400, 500);
             maxSize = new Vector2(440, 590);
             minSize = new Vector2(440, 590);
             Repaint();
@@ -76,7 +80,7 @@ public class dungeonGenerator : EditorWindow
         }
         else if (!_door || !_wall || !_floor)
         {
-            rekt = new Rect(20, 125, 400, 400);
+            rekt = new Rect(20, 125, 400, 500);
             maxSize = new Vector2(440, 550);
             minSize = new Vector2(440, 550);
             Repaint();
@@ -84,11 +88,80 @@ public class dungeonGenerator : EditorWindow
         }
         else
         {
-            rekt = new Rect(20, 85, 400, 400);
+            rekt = new Rect(20, 200, 400, 500);
             maxSize = new Vector2(440, 530);
             minSize = new Vector2(440, 530);
             Repaint();
         }
+
+#endregion
+
+        #region Botonera
+        //Boton para limpiar los puntitos 
+        Rect rectAdd = EditorGUILayout.BeginHorizontal("Button");
+        if (GUI.Button(rectAdd, GUIContent.none))
+        {
+            for (int i = 0; i < FloorList.Count; i++)
+            {
+                DestroyImmediate(FloorList[i]);
+            }
+            FloorList.Clear();
+            positions.Clear();
+            CircleHandless.Clear();
+            Repaint();
+        }
+        GUILayout.Label("Clean window");
+        EditorGUILayout.EndHorizontal();
+
+
+        Rect cleanSceneRekt = EditorGUILayout.BeginHorizontal("Button");
+        if (GUI.Button(cleanSceneRekt, GUIContent.none))
+        {
+            for (int i = 0; i < FloorList.Count; i++)
+            {
+                DestroyImmediate(FloorList[i]);
+            }
+            for (int i = 0; i < positions.Count; i++)
+            {
+                DestroyImmediate(FloorList[i]);
+            }
+            CircleHandless.Clear();
+        }
+        GUILayout.Label("Clear scene");
+        EditorGUILayout.EndHorizontal();
+
+
+        Rect ClearlastPref = EditorGUILayout.BeginHorizontal("Button");
+        if (GUI.Button(ClearlastPref, GUIContent.none))
+        {
+            DestroyImmediate(FloorList[FloorList.Count - 1]);
+            FloorList.RemoveAt(FloorList.Count - 1);
+            CircleHandless.RemoveAt(CircleHandless.Count - 1);
+        }
+        GUILayout.Label("Remove last biuld");
+        EditorGUILayout.EndHorizontal();
+
+
+        ////boton para generar cositas
+        Rect generateRekt = EditorGUILayout.BeginHorizontal("Button");
+        if (GUI.Button(generateRekt, GUIContent.none))
+        {
+            foreach (var p in positions)
+            {
+                _floor.transform.position = ReajustVector2(p);
+                GameObject currentfloor = Instantiate(_floor);
+                FloorList.Add(currentfloor);
+            }
+            positions.Clear();
+        }
+        GUILayout.Label("Generate");
+        EditorGUILayout.EndHorizontal();
+
+
+        #endregion
+
+        GUI.BeginGroup(rekt);
+        #region Creador de lineas
         //Lineas en sí
         Handles.BeginGUI();
         for (int i = (int)(0 + offset.x); i < position.width + offset.x; i += linesEvery)
@@ -113,13 +186,21 @@ public class dungeonGenerator : EditorWindow
             }
             thickLines++;
         }
+        #endregion
+
+        #region puntos rojos sobre la grilla
+
         //Los puntitos rojos que proximamente van a ser cuadrados
         if (!Event.current.control && Event.current.button == 0 && Event.current.type == EventType.mouseDown)
         {
-            positions.Add(Event.current.mousePosition - offset);
+            int posx = (int)Event.current.mousePosition.x;
+            int posy = (int)Event.current.mousePosition.y;
+
+            positions.Add(new Vector2((posx), (posy)));
+            CircleHandless.Add(new Vector2((posx), (posy)));
             Repaint();
         }
-        foreach (var pos in positions)
+        foreach (var pos in CircleHandless)
         {
             Handles.color = Color.red;
             Handles.DrawSolidDisc(pos + offset, Vector3.forward, 2);
@@ -131,48 +212,18 @@ public class dungeonGenerator : EditorWindow
         Handles.EndGUI();
         GUI.EndGroup();
 
-        //Boton para limpiar los puntitos 
-        Rect rectAdd = EditorGUILayout.BeginHorizontal("Button");
-        if (GUI.Button(rectAdd, GUIContent.none))
-        {
-            positions.Clear();
-            Repaint();
-        }
-        GUILayout.Label("Clean window");
-        EditorGUILayout.EndHorizontal();
-
-
-        Rect cleanSceneRekt = EditorGUILayout.BeginHorizontal("Button");
-        if (GUI.Button(cleanSceneRekt, GUIContent.none))
-        {
-            DestroyImmediate(GameObject.Find("Piso(Clone)"));
-            DestroyImmediate(GameObject.Find("Pared(Clone)"));
-            DestroyImmediate(GameObject.Find("Puerta(Clone)"));
-        }
-        GUILayout.Label("Clear scene");
-        EditorGUILayout.EndHorizontal();
-
-        ////boton para generar cositas
-        Rect generateRekt = EditorGUILayout.BeginHorizontal("Button");
-        if (GUI.Button(generateRekt, GUIContent.none))
-        {
-            foreach (var p in positions)
-            {
-                _floor.transform.position = ReajustVector2(p);
-                Instantiate(_floor);
-            }
-        }
-        GUILayout.Label("Generate");
-        EditorGUILayout.EndHorizontal();
+        #endregion
 
     }
-
-    Vector3 ReajustVector2(Vector2 _v2)
-    { //Ajusta el vector2 a v3 y lo reduce
-        Vector3 _v3;
-        _v3.x = _v2.x / 6;
-        _v3.y = 0;
-        _v3.z = _v2.y / 6;
-        return _v3;
-    }
+        #region Ajuste de grilla
+        Vector3 ReajustVector2(Vector2 _v2)
+        { //Ajusta el vector2 a v3 y lo reduce
+            Vector3 _v3;
+            _v3.x = _v2.x / 6;
+            _v3.y = 0;
+            _v3.z = _v2.y / 6;
+            return _v3;
+        }
+        #endregion
 }
+
