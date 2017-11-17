@@ -5,12 +5,15 @@ using UnityEditor;
 
 public class VentanaCreadora : EditorWindow
 {
-    private bool ModoManual;
+    private bool ModoManual = true;
     public GameObject Camara;
     public GameObject CurrentFloor;
     public GameObject _Piso;
     public GameObject _Pared;
     public GameObject _Puerta;
+    public static GameObject _ParedDerecha, _ParedIzquierda, _ParedArriba, _ParedAbajo;
+    public static GameObject _VParedDerecha, _VParedIzquierda, _VParedArriba, _VParedAbajo;
+
     public List<string> ListaDeCercanos;
 
     private int _CantidadDePuertas = 1;    
@@ -101,13 +104,8 @@ public class VentanaCreadora : EditorWindow
         GUILayout.Label("", GUILayout.Width(140));
             if (GUILayout.Button("↑", GUILayout.Width(100)))
             {
-                GameObject PisoCreado = Instantiate(CurrentFloor);
-                PisoCreado.transform.position = new Vector3(CurrentFloor.transform.position.x + 10, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z);
-                DatosGenerales.ContadorDeSalas++;
-                CurrentFloor = PisoCreado;
-                PisoCreado.name = "Sala ";
-                Selection.activeGameObject = PisoCreado;
-                Debug.Log("" + DatosGenerales.ContadorDeSalas);
+                DestroyImmediate(_ParedArriba);
+                DestroyImmediate(_VParedAbajo);
             }
         GUILayout.EndHorizontal();
         EditorGUILayout.Space();
@@ -116,23 +114,16 @@ public class VentanaCreadora : EditorWindow
         GUILayout.Label("", GUILayout.Width(43));
             if (GUILayout.Button("←", GUILayout.Width(100)))
             {
-                GameObject PisoCreado = Instantiate(CurrentFloor);
-                CurrentFloor = PisoCreado;
-                PisoCreado.transform.position = new Vector3(CurrentFloor.transform.position.x, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z +10);
-                PisoCreado.name = "Sala " + PisoCreado.transform.position.x + PisoCreado.transform.position.z;
-                DatosGenerales.ContadorDeSalas++;
-                Selection.activeGameObject = PisoCreado;
+                DestroyImmediate(_ParedDerecha);
+                DestroyImmediate(_VParedIzquierda);
             }
             
         GUILayout.Label("", GUILayout.Width(87));
             if (GUILayout.Button("→", GUILayout.Width(100)))
             {
-                GameObject PisoCreado = Instantiate(CurrentFloor);
-                CurrentFloor = PisoCreado;
-                PisoCreado.transform.position = new Vector3(CurrentFloor.transform.position.x, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z -10);
-                PisoCreado.name = "Sala " + PisoCreado.transform.position.x + PisoCreado.transform.position.z;
-                DatosGenerales.ContadorDeSalas++;
-                Selection.activeGameObject = PisoCreado;
+                DestroyImmediate(_ParedIzquierda);
+                DestroyImmediate(_VParedDerecha);
+                //Selection.activeGameObject = PisoCreado;
             }            
         GUILayout.EndHorizontal();
         EditorGUILayout.Space();
@@ -141,21 +132,13 @@ public class VentanaCreadora : EditorWindow
         GUILayout.Label("", GUILayout.Width(140));
             if (GUILayout.Button("↓", GUILayout.Width(100)))
             {
-                GameObject PisoCreado = Instantiate(CurrentFloor);
-                CurrentFloor = PisoCreado;
-                PisoCreado.transform.position = new Vector3(CurrentFloor.transform.position.x - 10, CurrentFloor.transform.position.y, CurrentFloor.transform.position.z); ;
-                PisoCreado.name = "Sala " + PisoCreado.transform.position.x + PisoCreado.transform.position.z;
-                DatosGenerales.ContadorDeSalas++;
-                Selection.activeGameObject = PisoCreado;
+                DestroyImmediate(_ParedAbajo);
+                DestroyImmediate(_VParedArriba);
             }            
         GUILayout.EndHorizontal();
         }
 
 
-        #endregion
-
-        #region Gizmos
-               
         #endregion
 
         fixedValues();

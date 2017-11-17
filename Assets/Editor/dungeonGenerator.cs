@@ -48,26 +48,41 @@ public class dungeonGenerator : EditorWindow
         _door = (GameObject)Resources.Load("Puerta");
 
         _floor = (GameObject)EditorGUILayout.ObjectField("Piso: ", _floor, typeof(GameObject), true);
-        if (!_floor)
+
+       /* if (!_floor)
         {
             EditorGUILayout.HelpBox("Seleccione un píso", MessageType.Warning);
         }
+        */
         EditorGUILayout.Space();
 
         _wall = (GameObject)EditorGUILayout.ObjectField("Pared: ", _wall, typeof(GameObject), true);
-        if (!_wall)
+        /*if (!_wall)
         {
             EditorGUILayout.HelpBox("Seleccione una puerta", MessageType.Warning);
         }
+        */
         EditorGUILayout.Space();
 
         _door = (GameObject)EditorGUILayout.ObjectField("Puerta: ", _door, typeof(GameObject), true);
-        if (!_door)
+        /*if (!_door)
         {
             EditorGUILayout.HelpBox("Seleccione una pared", MessageType.Warning);
         }
+        */
         EditorGUILayout.Space();
 
+
+        if (GUILayout.Button("Tocar"))
+
+        {
+            
+
+            ((VentanaCreadora)GetWindow(typeof(VentanaCreadora))).Show();
+
+            GUILayout.Label("Abrir la otra ventana");
+            EditorGUILayout.EndHorizontal();
+        }
         //    BotonUsado = (Texture)EditorGUILayout.ObjectField("TexturaImagen", BotonUsado, typeof(Texture), true);
 
         //Lineas 
@@ -191,21 +206,37 @@ public class dungeonGenerator : EditorWindow
                         #region NoVEr.
                         if (GameObject.Find("Habitacion " + (NumeroSenda - 10)))
                         {
+                            Selection.activeGameObject = GameObject.Find("Habitacion "+NumeroSenda);
+
                             Transform trans = GameObject.Find("Habitacion " + (NumeroSenda - 10)).GetComponentInChildren<Transform>().GetChild(3);
-                            //Transform Trans2 = 
-                            DestroyImmediate(trans.gameObject);
+                            Transform trans2 = GameObject.Find("Habitacion " + NumeroSenda).GetComponentInChildren<Transform>().GetChild(2);
+                           
+                            VentanaCreadora._ParedDerecha = trans.gameObject;
+                            VentanaCreadora._VParedIzquierda = trans2.gameObject;
                         }
                         if (GameObject.Find("Habitacion " + (NumeroSenda + 10)))
                         {
-                            Debug.Log("Existe PAred A Romper En La Izquierda");
+                            Selection.activeGameObject = GameObject.Find("Habitacion " + NumeroSenda);
+                            Transform trans = GameObject.Find("Habitacion " + (NumeroSenda + 10)).GetComponentInChildren<Transform>().GetChild(2);
+                            Transform trans2 = GameObject.Find("Habitacion " + NumeroSenda).GetComponentInChildren<Transform>().GetChild(3);
+                            VentanaCreadora._ParedIzquierda = trans.gameObject;
+                            VentanaCreadora._VParedDerecha = trans2.gameObject;
                         }
                         if (GameObject.Find("Habitacion " + (NumeroSenda + 1)))
                         {
-                            Debug.Log("Existe PAred A Romper Arriba");
+                            Selection.activeGameObject = GameObject.Find("Habitacion " + NumeroSenda);
+                            Transform trans = GameObject.Find("Habitacion " + (NumeroSenda + 1)).GetComponentInChildren<Transform>().GetChild(1);
+                            Transform trans2 = GameObject.Find("Habitacion " + NumeroSenda).GetComponentInChildren<Transform>().GetChild(0);
+                            VentanaCreadora._ParedArriba = trans.gameObject;
+                            VentanaCreadora._VParedAbajo = trans2.gameObject;                           
                         }
                         if (GameObject.Find("Habitacion " + (NumeroSenda - 1)))
                         {
-                            Debug.Log("Existe PAred A Romper Abajo");
+                            Selection.activeGameObject = GameObject.Find("Habitacion " + NumeroSenda);
+                            Transform trans = GameObject.Find("Habitacion " + (NumeroSenda - 1)).GetComponentInChildren<Transform>().GetChild(0);
+                            Transform trans2 = GameObject.Find("Habitacion " + NumeroSenda).GetComponentInChildren<Transform>().GetChild(1);
+                            VentanaCreadora._ParedAbajo = trans.gameObject;
+                            VentanaCreadora._VParedArriba = trans2.gameObject;
                         }
                         #endregion
 
@@ -222,6 +253,9 @@ public class dungeonGenerator : EditorWindow
             }
 
         }
+
+        Handles.EndGUI();
+        GUI.EndGroup();
         #endregion
 
         #region puntos rojos sobre la grilla
