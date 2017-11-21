@@ -72,12 +72,9 @@ public class dungeonGenerator : EditorWindow
         */
         EditorGUILayout.Space();
 
-
         if (GUILayout.Button("Tocar"))
 
         {
-            
-
             ((VentanaCreadora)GetWindow(typeof(VentanaCreadora))).Show();
 
             GUILayout.Label("Abrir la otra ventana");
@@ -119,7 +116,6 @@ public class dungeonGenerator : EditorWindow
             minSize = new Vector2(440, 530);
             Repaint();
         }
-
         #endregion
 
         #region Botonera
@@ -140,7 +136,6 @@ public class dungeonGenerator : EditorWindow
         GUILayout.Label("Clean window");
         EditorGUILayout.EndHorizontal();
 
-
         Rect cleanSceneRekt = EditorGUILayout.BeginHorizontal("Button");
         if (GUI.Button(cleanSceneRekt, GUIContent.none))
         {
@@ -156,7 +151,6 @@ public class dungeonGenerator : EditorWindow
         GUILayout.Label("Clear scene");
         EditorGUILayout.EndHorizontal();
 
-
         Rect ClearlastPref = EditorGUILayout.BeginHorizontal("Button");
 
         if (GUI.Button(ClearlastPref, GUIContent.none) && ListaDeObjetos.Count > 0)
@@ -167,8 +161,6 @@ public class dungeonGenerator : EditorWindow
 
         GUILayout.Label("Remove last biuld");
         EditorGUILayout.EndHorizontal();
-
-
         #endregion
 
         GUI.BeginGroup(rekt);
@@ -182,7 +174,11 @@ public class dungeonGenerator : EditorWindow
             for (int i = 0; i < 400; i += Anchoboton)
             {
                 Rect Rectangulo = new Rect(i, j, Anchoboton, AltoBoton);
-                if (GUI.Button(Rectangulo, "" + i / Anchoboton + j / AltoBoton))
+
+                // si el boton con id i/j existe, color = verde fluor
+                // else color = white
+
+                if (GUI.Button(Rectangulo, "" + i / Anchoboton + "," + j / AltoBoton))
                 {                    
                     string Senda = "" + i / Anchoboton + j / AltoBoton;
                     int NumeroSenda = System.Convert.ToInt32(Senda);
@@ -194,7 +190,6 @@ public class dungeonGenerator : EditorWindow
                         {
                             Debug.Log("Hi");
                         }
-
                         materialprueva = GameObject.Find("Cube");
                         GameObject Prueva = Instantiate(materialprueva);
                         Prueva.name = "Habitacion " + NumeroSenda;
@@ -239,19 +234,14 @@ public class dungeonGenerator : EditorWindow
                             VentanaCreadora._VParedArriba = trans2.gameObject;
                         }
                         #endregion
-
                     }
 
                     else
                     {
                         DestroyImmediate(GameObject.Find("Habitacion " + NumeroSenda));
                     }
-
-
                 }
-
             }
-
         }
 
         Handles.EndGUI();
@@ -283,8 +273,8 @@ public class dungeonGenerator : EditorWindow
             GUI.EndGroup();
             */
         #endregion
-
     }
+
     #region Ajuste de grilla
     Vector3 ReajustVector2(Vector2 _v2)
     { //Ajusta el vector2 a v3 y lo reduce

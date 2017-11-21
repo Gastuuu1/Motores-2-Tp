@@ -16,7 +16,7 @@ public class VentanaCreadora : EditorWindow
 
     public List<string> ListaDeCercanos;
 
-    private int _CantidadDePuertas = 1;    
+    private int _CantidadDePuertas = 1;
 
     [ExecuteInEditMode]
     [MenuItem("Creacion De Terreno/Ventana De Dungeon")]
@@ -30,48 +30,16 @@ public class VentanaCreadora : EditorWindow
     {
         CurrentFloor = Selection.activeGameObject;
 
-        #region Cargar Datos
-        Camara = GameObject.Find("Main Camera");
-        maxSize = new Vector2(300,300);
-        minSize = new Vector2(400, 600);
-        _Piso = GameObject.Find("Piso");
-        _Pared = GameObject.Find("Pared");
-        _Puerta = GameObject.Find("Puerta");
-        #endregion
-
         if (CurrentFloor)
         {
-        EditorGUILayout.LabelField("El nombre del piso actual es :" + CurrentFloor.name);
+            EditorGUILayout.LabelField("El nombre del piso actual es :" + CurrentFloor.name);
         }
-
-        #region Object Field
-        if (!_Piso)
-        {
-        EditorGUILayout.HelpBox("Seleccione un píso", MessageType.Info);
-        }
-        _Piso = (GameObject)EditorGUILayout.ObjectField("Objeto: ", _Piso, typeof(GameObject), true);
-        EditorGUILayout.Space();
-
-        if (!_Pared)
-        {
-        EditorGUILayout.HelpBox("Seleccione una puerta", MessageType.Info);
-        }
-        _Pared = (GameObject)EditorGUILayout.ObjectField("Puerta: ", _Pared, typeof(GameObject), true);
-        EditorGUILayout.Space();
-
-        if (!_Puerta)
-        {
-        EditorGUILayout.HelpBox("Seleccione una pared", MessageType.Info);
-        }
-        _Puerta = (GameObject)EditorGUILayout.ObjectField("Pared: ", _Puerta, typeof(GameObject), true);
-        EditorGUILayout.Space();
-        #endregion
 
         #region Variables
         EditorGUILayout.BeginHorizontal();
-        
-        GUILayout.Label("La cantidad de puertas a crear es : ",GUILayout.Width(210));
-        GUILayout.TextField("" + _CantidadDePuertas,GUILayout.Width(20));
+
+        GUILayout.Label("La cantidad de puertas a crear es : ", GUILayout.Width(210));
+        GUILayout.TextField("" + _CantidadDePuertas, GUILayout.Width(20));
         if (GUILayout.Button("<"))
         {
             _CantidadDePuertas--;
@@ -93,49 +61,82 @@ public class VentanaCreadora : EditorWindow
 
         #region Modo Manual
         GUILayout.BeginHorizontal();
-        ModoManual = GUILayout.Toggle(ModoManual, "▼",GUILayout.Width(10));
-        EditorGUILayout.LabelField("Editor Manual :",EditorStyles.boldLabel);
+        ModoManual = GUILayout.Toggle(ModoManual, "▼", GUILayout.Width(10));
+        EditorGUILayout.LabelField("Editor Manual :", EditorStyles.boldLabel);
         GUILayout.EndHorizontal();
 
         if (ModoManual)
         {
-        EditorGUILayout.Space();
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("", GUILayout.Width(140));
+            EditorGUILayout.Space();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("", GUILayout.Width(140));
+
+            if (_ParedArriba)
+            {
+                GUI.color = Color.green;
+            }
+            else GUI.color = Color.red;
+
             if (GUILayout.Button("↑", GUILayout.Width(100)))
             {
+                /*  _ParedArriba.SetActive(false);
+                  _VParedAbajo.SetActive(false);*/ //se caga todo
                 DestroyImmediate(_ParedArriba);
                 DestroyImmediate(_VParedAbajo);
+                
             }
-        GUILayout.EndHorizontal();
-        EditorGUILayout.Space();
+            GUILayout.EndHorizontal();
+            EditorGUILayout.Space();
 
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("", GUILayout.Width(43));
+            GUILayout.BeginHorizontal();
+
+            if (_ParedDerecha)
+            {
+                GUI.color = Color.green;
+            }
+            else GUI.color = Color.red;
+
+            GUILayout.Label("", GUILayout.Width(43));
             if (GUILayout.Button("←", GUILayout.Width(100)))
             {
+            /*    _ParedDerecha.SetActive(false);
+                _VParedIzquierda.SetActive(true);*/
                 DestroyImmediate(_ParedDerecha);
                 DestroyImmediate(_VParedIzquierda);
             }
-            
-        GUILayout.Label("", GUILayout.Width(87));
+
+            if (_ParedIzquierda)
+            {
+                GUI.color = Color.green;
+            }
+            else GUI.color = Color.red;
+
+            GUILayout.Label("", GUILayout.Width(87));
             if (GUILayout.Button("→", GUILayout.Width(100)))
             {
+                /*   _ParedIzquierda.SetActive(false);
+                   _VParedDerecha.SetActive(false);*/
                 DestroyImmediate(_ParedIzquierda);
                 DestroyImmediate(_VParedDerecha);
-                //Selection.activeGameObject = PisoCreado;
-            }            
-        GUILayout.EndHorizontal();
-        EditorGUILayout.Space();
+            }
+            GUILayout.EndHorizontal();
+            EditorGUILayout.Space();
 
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("", GUILayout.Width(140));
+            GUILayout.BeginHorizontal();
+
+            if (_ParedAbajo)
+            {
+                GUI.color = Color.green;
+            }
+            else GUI.color = Color.red;
+
+            GUILayout.Label("", GUILayout.Width(140));
             if (GUILayout.Button("↓", GUILayout.Width(100)))
             {
                 DestroyImmediate(_ParedAbajo);
                 DestroyImmediate(_VParedArriba);
-            }            
-        GUILayout.EndHorizontal();
+            }
+            GUILayout.EndHorizontal();
         }
 
 
@@ -157,8 +158,8 @@ public class VentanaCreadora : EditorWindow
         string LugarActual = CurrentFloor.name;
         char Posx = LugarActual[LugarActual.Length];
         char Posy = LugarActual[LugarActual.Length - 1];
-        Debug.Log("" + Posx + Posy);                        
+        Debug.Log("" + Posx + Posy);
     }
 
-   
+
 }
