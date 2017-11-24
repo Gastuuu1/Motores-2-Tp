@@ -11,14 +11,12 @@ public class dungeonGenerator : EditorWindow
     public GameObject _door;
     public GameObject materialprueva;
 
-    public Texture BotonUsado;
     Vector2 offset = new Vector2();
     int AltoBoton = 30;
     int Anchoboton = 40;
     Rect rekt;
 
     public List<GameObject> ListaDeObjetos = new List<GameObject>();
-    public List<GameObject> ListaVecinos = new List<GameObject>();
 
     List<Vector2> positions = new List<Vector2>();
     List<Vector2> CircleHandless = new List<Vector2>();
@@ -29,8 +27,11 @@ public class dungeonGenerator : EditorWindow
     int thiccLinesEvery = 5;
 
 
-    public bool draw;
-    public Vector2 drawing;
+    //Test
+    public GameObject _ParedDerecha, _ParedIzquierda, _ParedArriba, _ParedAbajo;
+    public GameObject _VParedDerecha, _VParedIzquierda, _VParedArriba, _VParedAbajo;
+    public GameObject _CurrentFloor;
+
 
     [ExecuteInEditMode]
     [MenuItem("Terrain/Generador de Dungeon")]
@@ -42,6 +43,7 @@ public class dungeonGenerator : EditorWindow
 
     private void OnGUI()
     {
+        #region cossas
         materialprueva = (GameObject)Resources.Load("Cube");
         _floor = (GameObject)Resources.Load("Piso");
         _wall = (GameObject)Resources.Load("Pared");
@@ -49,71 +51,54 @@ public class dungeonGenerator : EditorWindow
 
         _floor = (GameObject)EditorGUILayout.ObjectField("Piso: ", _floor, typeof(GameObject), true);
 
-       /* if (!_floor)
-        {
-            EditorGUILayout.HelpBox("Seleccione un píso", MessageType.Warning);
-        }
-        */
         EditorGUILayout.Space();
 
         _wall = (GameObject)EditorGUILayout.ObjectField("Pared: ", _wall, typeof(GameObject), true);
-        /*if (!_wall)
-        {
-            EditorGUILayout.HelpBox("Seleccione una puerta", MessageType.Warning);
-        }
-        */
+
         EditorGUILayout.Space();
 
         _door = (GameObject)EditorGUILayout.ObjectField("Puerta: ", _door, typeof(GameObject), true);
-        /*if (!_door)
-        {
-            EditorGUILayout.HelpBox("Seleccione una pared", MessageType.Warning);
-        }
-        */
+
         EditorGUILayout.Space();
 
         if (GUILayout.Button("Tocar"))
-
         {
             ((VentanaCreadora)GetWindow(typeof(VentanaCreadora))).Show();
-
             GUILayout.Label("Abrir la otra ventana");
             EditorGUILayout.EndHorizontal();
         }
-        //    BotonUsado = (Texture)EditorGUILayout.ObjectField("TexturaImagen", BotonUsado, typeof(Texture), true);
-
-        //Lineas 
+        #endregion 
 
         #region Cosa de los if
         //Recalcular segun las alertas 
         if (!_door && !_wall && !_floor)
         {
             rekt = new Rect(20, 220, 400, 500);
-            maxSize = new Vector2(440, 650);
-            minSize = new Vector2(440, 650);
+            maxSize = new Vector2(440, 700);
+            minSize = new Vector2(440, 700);
             Repaint();
         }
         else if ((!_door && !_wall) || (!_floor && !_wall) || (!_floor && !_door))
         {
             rekt = new Rect(20, 170, 400, 500);
-            maxSize = new Vector2(440, 590);
-            minSize = new Vector2(440, 590);
+            maxSize = new Vector2(440, 700);
+            minSize = new Vector2(440, 700);
             Repaint();
 
         }
         else if (!_door || !_wall || !_floor)
         {
             rekt = new Rect(20, 125, 400, 500);
-            maxSize = new Vector2(440, 550);
-            minSize = new Vector2(440, 550);
+            maxSize = new Vector2(440, 700);
+            minSize = new Vector2(440, 700);
             Repaint();
 
         }
         else
         {
             rekt = new Rect(20, 200, 400, 500);
-            maxSize = new Vector2(440, 530);
-            minSize = new Vector2(440, 530);
+            maxSize = new Vector2(440, 700);
+            minSize = new Vector2(440, 700);
             Repaint();
         }
         #endregion
@@ -133,7 +118,7 @@ public class dungeonGenerator : EditorWindow
                 Repaint();
             }
         }
-        GUILayout.Label("Clean window");
+        GUILayout.Label("Clean scene");
         EditorGUILayout.EndHorizontal();
 
         Rect cleanSceneRekt = EditorGUILayout.BeginHorizontal("Button");
@@ -148,7 +133,7 @@ public class dungeonGenerator : EditorWindow
             }
             CircleHandless.Clear();
         }
-        GUILayout.Label("Clear scene");
+        GUILayout.Label("Clear window");
         EditorGUILayout.EndHorizontal();
 
         Rect ClearlastPref = EditorGUILayout.BeginHorizontal("Button");
@@ -167,7 +152,6 @@ public class dungeonGenerator : EditorWindow
 
         #region Creador de botones
         Handles.BeginGUI();
-        //   GUI.color = Color.green;
         for (int j = 0; j < 300; j += AltoBoton)
         {
 
@@ -179,7 +163,9 @@ public class dungeonGenerator : EditorWindow
                 // else color = white
 
                 if (GUI.Button(Rectangulo, "" + i / Anchoboton + "," + j / AltoBoton))
-                {                    
+                {
+                    GUI.color = Color.green;
+
                     string Senda = "" + i / Anchoboton + j / AltoBoton;
                     int NumeroSenda = System.Convert.ToInt32(Senda);
 
@@ -194,48 +180,45 @@ public class dungeonGenerator : EditorWindow
                         GameObject Prueva = Instantiate(materialprueva);
                         Prueva.name = "Habitacion " + NumeroSenda;
                         ListaDeObjetos.Add(Prueva);
-
                         Prueva.transform.position = new Vector3(i / Anchoboton, Prueva.transform.position.y, j / -AltoBoton);
-                        Debug.Log("Se Toco Boton: " + i / Anchoboton + j / AltoBoton);
 
                         #region NoVEr.
                         if (GameObject.Find("Habitacion " + (NumeroSenda - 10)))
                         {
-                            Selection.activeGameObject = GameObject.Find("Habitacion "+NumeroSenda);
+                            Selection.activeGameObject = GameObject.Find("Habitacion " + NumeroSenda);
 
                             Transform trans = GameObject.Find("Habitacion " + (NumeroSenda - 10)).GetComponentInChildren<Transform>().GetChild(3);
                             Transform trans2 = GameObject.Find("Habitacion " + NumeroSenda).GetComponentInChildren<Transform>().GetChild(2);
-                           
-                            VentanaCreadora._ParedDerecha = trans.gameObject;
-                            VentanaCreadora._VParedIzquierda = trans2.gameObject;
+
+                            _ParedDerecha = trans.gameObject;
+                            _VParedIzquierda = trans2.gameObject;
                         }
                         if (GameObject.Find("Habitacion " + (NumeroSenda + 10)))
                         {
                             Selection.activeGameObject = GameObject.Find("Habitacion " + NumeroSenda);
                             Transform trans = GameObject.Find("Habitacion " + (NumeroSenda + 10)).GetComponentInChildren<Transform>().GetChild(2);
                             Transform trans2 = GameObject.Find("Habitacion " + NumeroSenda).GetComponentInChildren<Transform>().GetChild(3);
-                            VentanaCreadora._ParedIzquierda = trans.gameObject;
-                            VentanaCreadora._VParedDerecha = trans2.gameObject;
+                            _ParedIzquierda = trans.gameObject;
+                            _VParedDerecha = trans2.gameObject;
                         }
                         if (GameObject.Find("Habitacion " + (NumeroSenda + 1)))
                         {
                             Selection.activeGameObject = GameObject.Find("Habitacion " + NumeroSenda);
                             Transform trans = GameObject.Find("Habitacion " + (NumeroSenda + 1)).GetComponentInChildren<Transform>().GetChild(1);
                             Transform trans2 = GameObject.Find("Habitacion " + NumeroSenda).GetComponentInChildren<Transform>().GetChild(0);
-                            VentanaCreadora._ParedArriba = trans.gameObject;
-                            VentanaCreadora._VParedAbajo = trans2.gameObject;                           
+                            _ParedArriba = trans.gameObject;
+                            _VParedAbajo = trans2.gameObject;
                         }
                         if (GameObject.Find("Habitacion " + (NumeroSenda - 1)))
                         {
                             Selection.activeGameObject = GameObject.Find("Habitacion " + NumeroSenda);
                             Transform trans = GameObject.Find("Habitacion " + (NumeroSenda - 1)).GetComponentInChildren<Transform>().GetChild(0);
                             Transform trans2 = GameObject.Find("Habitacion " + NumeroSenda).GetComponentInChildren<Transform>().GetChild(1);
-                            VentanaCreadora._ParedAbajo = trans.gameObject;
-                            VentanaCreadora._VParedArriba = trans2.gameObject;
+                            _ParedAbajo = trans.gameObject;
+                            _VParedArriba = trans2.gameObject;
                         }
                         #endregion
                     }
-
                     else
                     {
                         DestroyImmediate(GameObject.Find("Habitacion " + NumeroSenda));
@@ -248,31 +231,78 @@ public class dungeonGenerator : EditorWindow
         GUI.EndGroup();
         #endregion
 
-        #region puntos rojos sobre la grilla
+        #region test
+        _CurrentFloor = Selection.activeGameObject;
 
-        /*    //Los puntitos rojos que proximamente van a ser cuadrados
-            if (!Event.current.control && Event.current.button == 0 && Event.current.type == EventType.mouseDown)
-            {
-                int posx = (int)Event.current.mousePosition.x;
-                int posy = (int)Event.current.mousePosition.y;
+        if (_CurrentFloor)
+            EditorGUILayout.LabelField("El nombre del piso actual es :" + _CurrentFloor.name);
 
-                positions.Add(new Vector2((posx), (posy)));
-                CircleHandless.Add(new Vector2((posx), (posy)));
-                Repaint();
-            }
-            foreach (var pos in CircleHandless)
-            {
-                Handles.color = Color.red;
-                Handles.DrawSolidDisc(pos + offset, Vector3.forward, 2);
-                var col = Color.red;
-                col.a = .1f;
-                Handles.color = col;
-                Handles.CubeHandleCap(0, pos + offset, Quaternion.identity, 200, EventType.ContextClick);  //keondaestojelpmi            
-            }
-            Handles.EndGUI();
-            GUI.EndGroup();
-            */
+        Repaint();
+
+        EditorGUILayout.Space();
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Label("", GUILayout.Width(140));
+
+        if (_ParedArriba)
+        {
+            GUI.color = Color.green;
+        }
+        else GUI.color = Color.red;
+
+        if (GUILayout.Button("↑", GUILayout.Width(100)))
+        {
+            DestroyImmediate(_ParedArriba);
+            DestroyImmediate(_VParedAbajo);
+        }
+        GUILayout.EndHorizontal();
+        EditorGUILayout.Space();
+
+        GUILayout.BeginHorizontal();
+
+        if (_ParedDerecha)
+        {
+            GUI.color = Color.green;
+        }
+        else GUI.color = Color.red;
+
+        GUILayout.Label("", GUILayout.Width(43));
+        if (GUILayout.Button("←", GUILayout.Width(100)))
+        {
+            DestroyImmediate(_ParedDerecha);
+            DestroyImmediate(_VParedIzquierda);
+        }
+        if (_ParedIzquierda)
+        {
+            GUI.color = Color.green;
+        }
+        else GUI.color = Color.red;
+
+        GUILayout.Label("", GUILayout.Width(87));
+        if (GUILayout.Button("→", GUILayout.Width(100)))
+        {
+            DestroyImmediate(_ParedIzquierda);
+            DestroyImmediate(_VParedDerecha);
+        }
+        GUILayout.EndHorizontal();
+        EditorGUILayout.Space();
+
+        GUILayout.BeginHorizontal();
+
+        if (_ParedAbajo)
+        {
+            GUI.color = Color.green;
+        }
+        else GUI.color = Color.red;
+
+        GUILayout.Label("", GUILayout.Width(140));
+        if (GUILayout.Button("↓", GUILayout.Width(100)))
+        {
+            DestroyImmediate(_ParedAbajo);
+            DestroyImmediate(_VParedArriba);
+        }
+        EditorGUILayout.EndHorizontal();
         #endregion
+
     }
 
     #region Ajuste de grilla
